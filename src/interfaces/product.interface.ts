@@ -4,14 +4,14 @@ export interface Product {
   id: string;
   title: string;
   price: number;
-  description: string;
-  slug: string;
-  stock: number;
-  sizes: Size[];
-  gender: String;
-  tags: String[];
+  description?: string;
+  slug?: string;
+  stock?: number;
+  sizes?: Size[];
+  gender: string;
+  tags?: String[];
   images: string[];
-  user: User;
+  user?: User;
 }
 
 export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
