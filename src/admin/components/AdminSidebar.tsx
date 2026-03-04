@@ -37,6 +37,8 @@ export const AdminSidebar = ({ isCollapsed, onToggle }: Props) => {
 
     const isActiveRoute = (to: string) => {
         // TODO: ajustarlo cuando estemos en la pantalla de producto
+        if (pathname.includes('/admin/products/') && to === '/admin/products')
+            return true
 
         return pathname === to
     }
