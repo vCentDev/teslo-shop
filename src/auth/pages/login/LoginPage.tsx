@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router"
 import { toast } from "sonner"
-import { loginAction } from "@/auth/actions/login.action"
+import { useAuthState } from "@/auth/store/auth.store"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,6 +11,7 @@ import { CustomLogo } from "@/components/custom/CustomLogo"
 
 export const LoginPage = () => {
 
+    const { login } = useAuthState()
     const [isPosting, setIsPosting] = useState(false)
     const navigate = useNavigate();
 
@@ -20,17 +21,15 @@ export const LoginPage = () => {
         const email = formData.get('email') as string
         const password = formData.get('password') as string
 
-        try {
-            const data = await loginAction(email, password)
-            localStorage.setItem('token', data.token)
-            console.log('re-direccionando al Home');
+        const isValid = await login(email, password)
+
+        if (isValid) {
             navigate('/')
-        } catch (error) {
-            toast.error('Correo y/o constraseña no validos')
-        } finally {
-            setIsPosting(false)
+            return
         }
 
+        toast.error('Correo y/o constraseña no validos')
+        setIsPosting(false)
     }
 
     return (
