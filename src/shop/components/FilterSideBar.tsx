@@ -1,14 +1,15 @@
+import { useSearchParams } from 'react-router';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useSearchParams } from 'react-router';
 
 export const FilterSidebar = () => {
 
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const currentSizes = searchParams.get('sizes')?.split(',') || []
+    const currentSizes = searchParams.get('sizes')?.split(',').filter(Boolean) ?? []
     const currentPrice = searchParams.get('price') || 'any'
 
 
@@ -24,7 +25,13 @@ export const FilterSidebar = () => {
             : [...currentSizes, size]
 
         searchParams.set('page', '1')
-        searchParams.set('size', newSizes.join(','))
+
+        if (newSizes.length === 0) {
+            searchParams.delete('sizes')
+        } else {
+            searchParams.set('sizes', newSizes.join(','))
+        }
+
         setSearchParams(searchParams)
     }
 
