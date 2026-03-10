@@ -1,17 +1,49 @@
 
+import { useState } from "react"
+import { Link, useNavigate } from "react-router"
+
+import { useAuthState } from "@/auth/store/auth.store"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CustomLogo } from "@/components/custom/CustomLogo"
-import { Link } from "react-router"
 
 export const RegisterPage = () => {
+    const { register } = useAuthState()
+    const navigate = useNavigate()
+    const [isLoading, setIsLoading] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+    const handleRegister = async (formData: FormData) => {
+        const fullName = formData.get('fullname')
+        const email = formData.get('email')
+        const password = formData.get('password')
+
+        if (typeof fullName !== 'string' || typeof email !== 'string' || typeof password !== 'string') return
+
+        setIsLoading(true)
+        setErrorMessage(null)
+
+        try {
+            const isRegisterSuccess = await register(fullName, email, password)
+
+            if (isRegisterSuccess) {
+                navigate('/')
+                return
+            }
+
+            setErrorMessage('No fue posible registrarse. Verifica tus datos e intenta nuevamente.')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return (
         <div className={"flex flex-col gap-6"}>
             <Card className="overflow-hidden p-0">
                 <CardContent className="grid p-0 md:grid-cols-2">
-                    <form className="p-6 md:p-8">
+                    <form className="p-6 md:p-8" action={handleRegister}>
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col items-center text-center">
                                 <CustomLogo />
@@ -19,26 +51,29 @@ export const RegisterPage = () => {
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Nombre:</Label>
-                                <Input id="name" type="text" placeholder="Tu nombre aquí" required />
+                                <Input id="name" type="text" placeholder="Tu nombre aquí" name="fullname" required />
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" placeholder="mail@google.com" required />
+                                <Input id="email" type="email" placeholder="mail@google.com" name="email" required />
                             </div>
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
                                     <a href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
-                                        Olvidaste tú contraseña?
+                                        ¿Olvidaste tu contraseña?
                                     </a>
                                 </div>
-                                <Input id="password" type="password" placeholder="Contraseña" required />
+                                <Input id="password" type="password" placeholder="Contraseña" name="password" required />
                             </div>
-                            <Button type="submit" className="w-full">
-                                Sing Up
+                            {errorMessage && (
+                                <p className="text-sm text-destructive text-center">{errorMessage}</p>
+                            )}
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? 'Registrando...' : 'Sign Up'}
                             </Button>
                             <Link to="/auth/login">
-                                <Button type="submit" className="w-full">
+                                <Button type="button" className="w-full">
                                     Login
                                 </Button>
                             </Link>
@@ -75,8 +110,8 @@ export const RegisterPage = () => {
                                 </Button>
                             </div>
                             <div className="text-center text-sm">
-                                ¿Ya tienes cuenta?
-                                <Link to="/auth/register" className="underline underline-offset-4">
+                                ¿Ya tienes cuenta?{' '}
+                                <Link to="/auth/login" className="underline underline-offset-4">
                                     Ingresa ahora
                                 </Link>
                             </div>
